@@ -28,6 +28,7 @@
             this.labelTime = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.comboBoxZoom = new System.Windows.Forms.ComboBox();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
@@ -52,7 +53,7 @@
             this.hScrollBarPos.Dock = System.Windows.Forms.DockStyle.Top;
             this.hScrollBarPos.Location = new System.Drawing.Point(85, 0);
             this.hScrollBarPos.Name = "hScrollBarPos";
-            this.hScrollBarPos.Size = new System.Drawing.Size(609, 17);
+            this.hScrollBarPos.Size = new System.Drawing.Size(608, 17);
             this.hScrollBarPos.TabIndex = 2;
             this.hScrollBarPos.ValueChanged += new System.EventHandler(this.hScrollBarPos_ValueChanged);
             // 
@@ -70,7 +71,7 @@
             this.tableLayoutPanel1.ColumnCount = 3;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.32349F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 87.67651F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 105F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 106F));
             this.tableLayoutPanel1.Controls.Add(this.hScrollBarPos, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.labelTime, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.comboBoxZoom, 2, 0);
@@ -91,11 +92,16 @@
             "50%",
             "10%",
             "1%"});
-            this.comboBoxZoom.Location = new System.Drawing.Point(697, 3);
+            this.comboBoxZoom.Location = new System.Drawing.Point(696, 3);
             this.comboBoxZoom.Name = "comboBoxZoom";
-            this.comboBoxZoom.Size = new System.Drawing.Size(100, 21);
+            this.comboBoxZoom.Size = new System.Drawing.Size(101, 21);
             this.comboBoxZoom.TabIndex = 4;
             this.comboBoxZoom.SelectionChangeCommitted += new System.EventHandler(this.comboBoxZoom_SelectionChangeCommitted);
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.FileName = "openFileDialog1";
+            this.openFileDialog1.Filter = "Wave files|*.wav";
             // 
             // Form1
             // 
@@ -120,6 +126,7 @@
         private System.Windows.Forms.Label labelTime;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.ComboBox comboBoxZoom;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
     }
 }
 

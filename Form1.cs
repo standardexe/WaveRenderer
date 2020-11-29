@@ -21,8 +21,10 @@ namespace WaveRenderer {
         public Form1() {
             InitializeComponent();
 
-            const string file = @"C:\Users\ae\Desktop\Julian Lage - Ill Be Seeing You (Live in Los Angeles).wav";
-            reader = new WaveProvider(System.IO.File.Open(file, System.IO.FileMode.Open));
+            if (openFileDialog1.ShowDialog() != DialogResult.OK) {
+                Application.Exit();
+            }
+            reader = new WaveProvider(System.IO.File.Open(openFileDialog1.FileName, System.IO.FileMode.Open));
 
             // build a zoom level pyramid data structure
             var zoomLevels = new[] { 64, 128, 256, 512, 1024, 2048, 4096, 8192 };
@@ -43,13 +45,19 @@ namespace WaveRenderer {
             this.MouseWheel += Form1_MouseWheel;
         }
 
+        private double ZoomFactor {
+            get => zoomFactor;
+            set {
+                zoomFactor = value;
+                comboBoxZoom.Text = $"{Math.Round(100 * zoomFactor / reader.SampleCount * pictureBox1.Width, 3)}%";
+            }
+        }
+
         private void Form1_MouseWheel(object sender, MouseEventArgs e) {
             const float scale_per_delta = 0.1f / 120;
-            var pdash = hScrollBarPos.Value + zoomFactor * e.X;
-            var p = e.X;
-            zoomFactor = Math.Max(1, zoomFactor * Math.Pow(10, e.Delta * scale_per_delta));
-            hScrollBarPos.Value = Math.Max(0, (int)(pdash - p * zoomFactor));
-            comboBoxZoom.Text = $"{Math.Round(100 * zoomFactor / reader.SampleCount * pictureBox1.Width, 3)}%";
+            var pdash = hScrollBarPos.Value + ZoomFactor * e.X;
+            ZoomFactor = Math.Max(1, ZoomFactor * Math.Pow(10, e.Delta * scale_per_delta));
+            hScrollBarPos.Value = Math.Max(0, (int)(pdash - e.X * ZoomFactor));
             pictureBox1.Invalidate();
         }
 
@@ -142,7 +150,7 @@ namespace WaveRenderer {
             }
 
             while (window.start < window.end) {
-                var screenPos = (float)((TimeToSamples(window.start) - hScrollBarPos.Value) / zoomFactor);
+                var screenPos = (float)((TimeToSamples(window.start) - hScrollBarPos.Value) / ZoomFactor);
                 g.DrawLine(Pens.LightGray, screenPos, 0, screenPos, pictureBox1.Height);
                 g.DrawString(window.start.ToString(@"m\:ss\.ff"), SystemFonts.CaptionFont, Brushes.Black, screenPos, 3);
                 window.start = window.start + timeStep;
@@ -160,7 +168,7 @@ namespace WaveRenderer {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
             var window = (start: SamplesToTime(hScrollBarPos.Value),
-                          end:   SamplesToTime(hScrollBarPos.Value) + SamplesToTime(zoomFactor * pictureBox1.Width));
+                          end:   SamplesToTime(hScrollBarPos.Value) + SamplesToTime(ZoomFactor * pictureBox1.Width));
 
             if (selection.Active) {
                 var selectStartTime = SamplesToTime(selection.Start);
@@ -173,7 +181,7 @@ namespace WaveRenderer {
             e.Graphics.ScaleTransform(1, -1);
             e.Graphics.TranslateTransform(0, -pictureBox1.Height);
 
-            if (zoomFactor < pyramid.RelativeFactor) {
+            if (ZoomFactor < pyramid.RelativeFactor) {
                 reader.CurrentTime = window.start;
                 var sampleCount = TimeToSamples(window.Duration());
                 var values = reader.Take(sampleCount).Select(frame => frame[0]).ToArray();
@@ -181,22 +189,22 @@ namespace WaveRenderer {
             } else {
                 var layer = (IMinMax)pyramid;
                 while (layer.Child != null) {
-                    if (layer.Child.AbsoluteFactor > zoomFactor) break;
+                    if (layer.Child.AbsoluteFactor > ZoomFactor) break;
                     layer = layer.Child;
                 }
 
-                Draw(layer, hScrollBarPos.Value, zoomFactor, gradientBrush, e.Graphics, pictureBox1.Height, pictureBox1.Width);
+                Draw(layer, hScrollBarPos.Value, ZoomFactor, gradientBrush, e.Graphics, pictureBox1.Height, pictureBox1.Width);
             }
         }
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e) {
-            selection.Start = selection.End = (int)(hScrollBarPos.Value + e.Location.X * zoomFactor);
+            selection.Start = selection.End = (int)(hScrollBarPos.Value + e.Location.X * ZoomFactor);
             selection.Active = true;
         }
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e) {
             if (e.Button == MouseButtons.Left) {
-                selection.End = (int)(hScrollBarPos.Value + e.Location.X * zoomFactor);
+                selection.End = (int)(hScrollBarPos.Value + e.Location.X * ZoomFactor);
                 pictureBox1.Invalidate();
             }
         }
@@ -204,8 +212,7 @@ namespace WaveRenderer {
         private void pictureBox1_MouseUp(object sender, MouseEventArgs e) {
             selection.Active = false;
             if (e.Button == MouseButtons.Left) {
-                zoomFactor = Math.Max(1, (selection.End - selection.Start) / (double)pictureBox1.Width);
-                comboBoxZoom.Text = $"{Math.Round(100 * zoomFactor / reader.SampleCount * pictureBox1.Width, 3)}%";
+                ZoomFactor = Math.Max(1, (selection.End - selection.Start) / (double)pictureBox1.Width);
                 hScrollBarPos.Value = selection.Start;
             }
         }
@@ -241,7 +248,7 @@ namespace WaveRenderer {
 
         private void comboBoxZoom_SelectionChangeCommitted(object sender, EventArgs e) {
             var text = comboBoxZoom.SelectedItem as string;
-            zoomFactor = int.Parse(text.Substring(0, text.Length - 1)) / 100.0 * reader.SampleCount / pictureBox1.Width;
+            ZoomFactor = int.Parse(text.Substring(0, text.Length - 1)) / 100.0 * reader.SampleCount / pictureBox1.Width;
             pictureBox1.Invalidate();
         }
     }
