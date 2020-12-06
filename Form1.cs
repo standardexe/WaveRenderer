@@ -110,7 +110,7 @@ namespace WaveRenderer {
             var hull = new PointF[Math.Min(layer.Values.Count - layerPosition, sampleCount) * 2];
             var i = 0;
             foreach (var (Min, Max) in layer.Values.Skip(layerPosition).Take(sampleCount)) {
-                hull[i] = new PointF(x, y - Max * y);
+                hull[i]                   = new PointF(x, y - Max * y);
                 hull[hull.Length - i - 1] = new PointF(x, y - Min * y);
                 i++;
                 x += sampleStep;
@@ -238,6 +238,7 @@ namespace WaveRenderer {
             gradientPen = new Pen(gradientBrush);
         }
 
+        // TimeSpan will only give us enough precision if constructed FromTicks!
         private TimeSpan SamplesToTime(double sampleCount) => 
             TimeSpan.FromTicks((long)(sampleCount / reader.Samplerate * TimeSpan.TicksPerSecond));
 

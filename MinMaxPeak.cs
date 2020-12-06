@@ -28,10 +28,20 @@ namespace WaveRenderer {
             }
         }
 
+        private (float Min, float Max) GetMinMax() {
+            var min = buffer[0];
+            var max = buffer[0];
+            foreach (var s in buffer) {
+                if (s < min) min = s;
+                else if (s > max) max = s;
+            }
+            return (min, max);
+        }
+
         public void Add(float value) {
             buffer[bufferSize++] = value;
             if (bufferSize == buffer.Length) {
-                values.Add((buffer.Min(), buffer.Max()));
+                values.Add(GetMinMax());
                 Child?.Add(values.Last());
                 bufferSize = 0;
             }
